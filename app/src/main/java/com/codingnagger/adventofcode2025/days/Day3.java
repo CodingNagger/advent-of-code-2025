@@ -65,8 +65,6 @@ public class Day3 implements Day {
             result.append(bank[largestI]);
         }
 
-        IO.println(input + " -> " + result);
-
         return Long.parseLong(result.toString());
     }
 }

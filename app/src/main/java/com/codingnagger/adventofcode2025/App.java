@@ -12,7 +12,7 @@ import java.util.List;
 
 public class App {
     public static void main(String[] args) {
-        System.out.println("Advent of Code 2024");
+        System.out.println("Advent of Code 2025");
 
         List<String> input = InputLoader.Load("day3.txt");
 
