@@ -22,6 +22,6 @@ public class Day3Tests {
     void partTwo() {
         String result = DAY.partTwo(INPUT);
 
-        assertThat(result).isEqualTo("");
+        assertThat(result).isEqualTo("3121910778619");
     }
 }
