@@ -89,6 +89,6 @@ public class Day4 implements Day {
         return count;
     }
 
-    record Position(int x, int y) {
+    private record Position(int x, int y) {
     }
 }
