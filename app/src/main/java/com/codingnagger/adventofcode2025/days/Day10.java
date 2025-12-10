@@ -88,17 +88,17 @@ public class Day10 implements Day {
                 final var current = queue.poll();
 
                 for (var b : buttons) {
-                    final var nextPresses = current.presses + 1;
-                    final var nextJoltages = b.press(current.joltages);
-                    final var nextKey = key(nextJoltages);
+                    final var nextStep = b.maxiPress(current, joltages);
+                    final var nextKey = key(nextStep.joltages);
 
-                    if ((!fewestPresses.containsKey(nextKey) || fewestPresses.get(nextKey) > nextPresses) && canReachTarget(nextJoltages)) {
-                        queue.add(new JoltageStep(nextPresses, nextJoltages));
-                        fewestPresses.put(nextKey, nextPresses);
+                    if ((!fewestPresses.containsKey(nextKey) || fewestPresses.get(nextKey) > nextStep.presses)) {
+                        queue.add(nextStep);
+                        fewestPresses.put(nextKey, nextStep.presses);
                     }
                 }
             }
 
+            IO.println("Result for " + key(joltages));
             return fewestPresses.get(key(joltages));
         }
 
@@ -130,12 +130,20 @@ public class Day10 implements Day {
             return newLights;
         }
 
-        public long[] press(long[] joltages) {
-            final var newJoltages = new long[joltages.length];
-            for (var i = 0; i < joltages.length; i++) {
-                newJoltages[i] = joltages[i] + (toggleIndexes.contains(i) ? 1 : 0);
+        public JoltageStep maxiPress(JoltageStep current, long[] targetJoltages) {
+            var start = toggleIndexes.getFirst();
+            var maxPresses = targetJoltages[start] - current.joltages[start];
+
+            for (var index : toggleIndexes) {
+                maxPresses = Math.min(maxPresses, targetJoltages[index] - current.joltages[index]);
             }
-            return newJoltages;
+
+            final var newJoltages = new long[current.joltages.length];
+            for (var i = 0; i < current.joltages.length; i++) {
+                newJoltages[i] = current.joltages[i] + (toggleIndexes.contains(i) ? maxPresses : 0);
+            }
+
+            return new JoltageStep(current.presses + maxPresses, newJoltages);
         }
     }
 
