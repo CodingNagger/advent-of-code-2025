@@ -2,6 +2,8 @@ package com.codingnagger.adventofcode2025.days;
 
 import java.util.*;
 
+import static com.codingnagger.adventofcode2025.utils.NVariableSolver.findSmallestSumNonNegativeSolution;
+
 public class Day10 implements Day {
     @Override
     public String partOne(List<String> input) {
@@ -78,42 +80,30 @@ public class Day10 implements Day {
         }
 
         public long fewestTotalPressesForJoltage() {
-            // bruteforce didn't work, need maths here
-            final var fewestPresses = new HashMap<String, Long>();
-            final var queue = new PriorityQueue<JoltageStep>(Comparator.comparingLong(s -> -s.presses));
+            IO.println("Solving for " + Arrays.toString(joltages) + " and buttons: " + buttons);
+            long[][] augmentedMatrix = buildEquationMatrix(buttons, joltages);
+            IO.println("Matrix for " + Arrays.toString(Arrays.stream(augmentedMatrix).map(Arrays::toString).map(s -> s + "\n").toArray()));
+            IO.println();
+            long[] solutions = findSmallestSumNonNegativeSolution(augmentedMatrix);
 
-            queue.add(new JoltageStep(0, new long[joltages.length]));
+            return Arrays.stream(solutions).sum();
+        }
 
-            while (!queue.isEmpty()) {
-                final var current = queue.poll();
+        private long[][] buildEquationMatrix(List<Button> buttons, long[] joltages) {
+            final var n = buttons.size();
+            long[][] matrix = new long[joltages.length][n + 1];
 
-                for (var b : buttons) {
-                    final var nextStep = b.maxiPress(current, joltages);
-                    final var nextKey = key(nextStep.joltages);
-
-                    if ((!fewestPresses.containsKey(nextKey) || fewestPresses.get(nextKey) > nextStep.presses)) {
-                        queue.add(nextStep);
-                        fewestPresses.put(nextKey, nextStep.presses);
+            for (var r = 0; r < joltages.length; r++) {
+                for (var i = 0; i < n; i++) {
+                    if (buttons.get(i).toggleIndexes().contains(r)) {
+                        matrix[r][i] = 1;
                     }
                 }
+
+                matrix[r][n] = joltages[r];
             }
 
-            IO.println("Result for " + key(joltages));
-            return fewestPresses.get(key(joltages));
-        }
-
-        private boolean canReachTarget(long[] nextJoltages) {
-            for (var i = 0; i < joltages.length; i++) {
-                if (nextJoltages[i] > joltages[i]) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        private String key(long[] nextJoltages) {
-            return Arrays.toString(nextJoltages);
+            return matrix;
         }
     }
 
